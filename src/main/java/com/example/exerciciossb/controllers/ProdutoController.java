@@ -1,7 +1,10 @@
 package com.example.exerciciossb.controllers;
 
+import com.example.exerciciossb.model.entities.Categoria;
 import com.example.exerciciossb.model.entities.Produto;
+import com.example.exerciciossb.model.repositories.CategoriaRepository;
 import com.example.exerciciossb.model.repositories.ProdutoRepository;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -17,8 +20,18 @@ public class ProdutoController {
     @Autowired
     private ProdutoRepository produtoRepository;
 
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
     @RequestMapping(method = {RequestMethod.POST, RequestMethod.PUT})
-    public @ResponseBody Produto novoProduto(@Valid Produto produto) {
+    public @ResponseBody Produto novoProduto(@Valid @RequestBody Produto produto) {
+        Optional<Categoria> optionalCategoria = categoriaRepository.findById(produto.getCategoria().getId());
+
+        if (optionalCategoria.isPresent()) {
+            produto.setCategoria(optionalCategoria.get());
+        } else {
+            throw new EntityNotFoundException("Categoria não encontrada com o ID: " + produto.getCategoria().getId());
+        }
         produtoRepository.save(produto);
         return produto;
     }
@@ -33,11 +46,6 @@ public class ProdutoController {
         return produtoRepository.findById(id);
     }
 
-    /*@PutMapping
-    public Produto  alterarProduto(@Valid Produto produto){
-        produtoRepository.save(produto);
-        return produto;
-    }*/
 
     @DeleteMapping("/{id}")
     public void excluirProduto(@PathVariable int id){

@@ -1,9 +1,6 @@
 package com.example.exerciciossb.model.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,13 +22,18 @@ public class Produto {
     @Max(1)
     private double desconto;
 
+    @ManyToOne
+    @JoinColumn(name = "categoria_id")
+    private Categoria categoria;
+
     public Produto(){
     }
 
-    public Produto(String nome, double preco, double desconto) {
+    public Produto(String nome, double preco, double desconto, Categoria categoria) {
         this.nome = nome;
         this.preco = preco;
         this.desconto = desconto;
+        this.categoria = categoria;
     }
 
     public int getId() {
@@ -64,5 +66,13 @@ public class Produto {
 
     public void setDesconto(double desconto) {
         this.desconto = desconto;
+    }
+
+    public Categoria getCategoria() {
+        return categoria;
+    }
+
+    public void setCategoria(Categoria categoria) {
+        this.categoria = categoria;
     }
 }
